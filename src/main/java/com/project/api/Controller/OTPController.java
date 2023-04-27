@@ -18,12 +18,12 @@ public class OTPController {
 
     @PostMapping("/validate")
     public ResponseEntity<ServiceResponse> validate(@RequestBody Map<String,String> otp) {
-        return ResponseEntity.ok(new ServiceResponse(HttpStatus.OK,"SUCCESS",null));
+        return ResponseEntity.ok(new ServiceResponse(HttpStatus.OK,"CODE VALIDATED",null));
     }
 
     @PostMapping("/generate")
     public ResponseEntity<ServiceResponse> generate(@RequestBody Map<String,String> email) {
-        return ResponseEntity.ok(new ServiceResponse(HttpStatus.OK,"SUCCESS",null));
+        return ResponseEntity.ok(new ServiceResponse(HttpStatus.OK,"CODE SENT TO EMAIL",null));
     }
 
 
