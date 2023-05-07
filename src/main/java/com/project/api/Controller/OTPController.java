@@ -1,5 +1,6 @@
 package com.project.api.Controller;
 
+import com.project.api.dto.request.AlexaCodeRequest;
 import com.project.api.dto.request.OTPGenRequest;
 import com.project.api.dto.request.PasswordRequest;
 import com.project.api.dto.response.ServiceResponse;
@@ -23,12 +24,24 @@ public class OTPController {
 
     @PostMapping("/validate")
     public ResponseEntity<ServiceResponse> validate(@RequestBody Map<String,String> otp) {
-        return ResponseEntity.ok(new ServiceResponse(HttpStatus.OK,"CODE VALIDATED",null));
+        return ResponseEntity.ok(new ServiceResponse(HttpStatus.OK.value(),"CODE VALIDATED",null));
     }
 
     @PostMapping("/generate")
     public ResponseEntity<ServiceResponse> generate(@RequestBody OTPGenRequest request) {
         ServiceResponse response = otpService.generateOTP(request);
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+    @PostMapping("/alexa/generate")
+    public ResponseEntity<ServiceResponse> generateAlexaCode(@RequestBody OTPGenRequest request) {
+        ServiceResponse response = otpService.generateAlexaCode(request);
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+    @PostMapping("/alexa/validate")
+            public ResponseEntity<ServiceResponse> validateAlexaCode(@RequestBody AlexaCodeRequest request) {
+        ServiceResponse response = otpService.validateAlexaCode(request);
         return ResponseEntity.status(response.getCode()).body(response);
     }
 

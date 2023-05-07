@@ -41,12 +41,12 @@ public class UserService {
                         .email(user.get().getEmail())
                         .macAddress(user.get().getMacAddress())
                         .build();
-                return new ServiceResponse(HttpStatus.OK,"SUCCESS",response);
+                return new ServiceResponse(HttpStatus.OK.value(),"SUCCESS",response);
             }
 
-            else return new ServiceResponse(HttpStatus.BAD_REQUEST,"User Not Found",null);
+            else return new ServiceResponse(HttpStatus.BAD_REQUEST.value(),"User Not Found",null);
         } catch (Exception e) {
-            return new ServiceResponse(HttpStatus.INTERNAL_SERVER_ERROR,e.getMessage(),null);
+            return new ServiceResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),e.getMessage(),null);
         }
     }
 
@@ -63,11 +63,11 @@ public class UserService {
                 user.setPassword(encoder.encode(request.getPassword()));
                 userRepository.update(user);
 
-                return new ServiceResponse(HttpStatus.OK,"Password Updated Successfully",null);
+                return new ServiceResponse(HttpStatus.OK.value(),"Password Updated Successfully",null);
             }
-            else return new ServiceResponse(HttpStatus.BAD_REQUEST,"User Not Found",null);
+            else return new ServiceResponse(HttpStatus.BAD_REQUEST.value(),"User Not Found",null);
         } catch (Exception e) {
-            return new ServiceResponse(HttpStatus.INTERNAL_SERVER_ERROR,e.getMessage(),null);
+            return new ServiceResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),e.getMessage(),null);
         }
 
     }
