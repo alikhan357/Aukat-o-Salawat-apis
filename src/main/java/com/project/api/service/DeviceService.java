@@ -18,9 +18,6 @@ import java.util.Optional;
 public class DeviceService {
 
     private final UserDeviceRepository userDeviceRepository;
-
-
-
     public ServiceResponse validateDevice(String deviceId) {
 
         try{
@@ -30,8 +27,6 @@ public class DeviceService {
            else{
                return new ServiceResponse(HttpStatus.NOT_FOUND.value(),"Data Not Found",null);
            }
-
-
         }
         catch (Exception e) {
             return new ServiceResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),e.getMessage(),null);

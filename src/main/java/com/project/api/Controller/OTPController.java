@@ -12,7 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api/v1/otp")
@@ -33,9 +35,9 @@ public class OTPController {
         return ResponseEntity.status(response.getCode()).body(response);
     }
 
-    @PostMapping("/alexa/generate")
-    public ResponseEntity<ServiceResponse> generateAlexaCode(@RequestBody OTPGenRequest request) {
-        ServiceResponse response = otpService.generateAlexaCode(request);
+    @GetMapping("/alexa/generate")
+    public ResponseEntity<ServiceResponse> generateAlexaCode(Principal principal) {
+        ServiceResponse response = otpService.generateAlexaCode(principal.getName());
         return ResponseEntity.status(response.getCode()).body(response);
     }
 

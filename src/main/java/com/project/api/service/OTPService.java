@@ -50,7 +50,7 @@ public class OTPService {
 
     }
 
-    public ServiceResponse generateAlexaCode(OTPGenRequest request){
+    public ServiceResponse generateAlexaCode(String email){
         try {
             //generate OTP
             String otp = getOTP(5);
@@ -62,10 +62,10 @@ public class OTPService {
                         continue;
                     }
                     else {
-                        if(alexaMap.containsValue(request.getEmail()))
-                            alexaMap.values().remove(request.getEmail());
+                        if(alexaMap.containsValue(email))
+                            alexaMap.values().remove(email);
 
-                        alexaMap.put(otp, request.getEmail());
+                        alexaMap.put(otp, email);
                     }
                 }
 
@@ -73,10 +73,10 @@ public class OTPService {
                     return new ServiceResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),"Failed to generate code",null);
             }
             else {
-                if(alexaMap.containsValue(request.getEmail())) {
-                    alexaMap.values().equals(request.getEmail());
+                if(alexaMap.containsValue(email)) {
+                    alexaMap.values().equals(email);
                 }
-                alexaMap.put(otp, request.getEmail());
+                alexaMap.put(otp, email);
             }
 
             alexaExpiry.put(otp,addMinutesToDate(2,new Date()));
