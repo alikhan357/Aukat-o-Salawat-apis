@@ -30,6 +30,19 @@ public class PlaylistController {
         return ResponseEntity.status(response.getCode()).body(response);
     }
 
+    @PostMapping("/audio/fav/{id}")
+    public ResponseEntity<ServiceResponse> favoriteAudio(Principal principal,@PathVariable String id){
+        ServiceResponse response = playlistService.markAudioAsFav(principal,id);
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+    @GetMapping("/audio/fav")
+    public ResponseEntity<ServiceResponse> favoriteAudio(Principal principal){
+        ServiceResponse response = playlistService.getFavAudio(principal);
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+
 
 }
 

@@ -24,6 +24,12 @@ public class ReminderController {
         return ResponseEntity.status(response.getCode()).body(response);
     }
 
+    @GetMapping("/")
+    public ResponseEntity<ServiceResponse> get(Principal principal){
+        ServiceResponse response = reminderService.getReminders(principal);
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
 
 }
 

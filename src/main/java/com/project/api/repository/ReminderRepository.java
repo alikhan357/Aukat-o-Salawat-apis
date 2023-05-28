@@ -25,7 +25,7 @@ public class ReminderRepository {
         return reminder;
     }
 
-    public Optional<Reminder> findByEmail(String email){
+    public Optional<List<Reminder>> findByEmail(String email){
         DynamoDBScanExpression expression = new DynamoDBScanExpression();
         expression.addFilterCondition("email",new Condition()
                 .withComparisonOperator(ComparisonOperator.EQ)
@@ -34,7 +34,7 @@ public class ReminderRepository {
 
         List<Reminder> reminders = dynamoDBMapper.scan(Reminder.class,expression);
 
-        return reminders.size() == 0 ? Optional.empty() : Optional.of(reminders.get(0));
+        return reminders.size() == 0 ? Optional.empty() : Optional.of(reminders);
     }
 
     public Optional<Reminder> findByEmailAndNamaz(String email, String namaz) {
