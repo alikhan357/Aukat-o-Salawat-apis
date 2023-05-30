@@ -1,0 +1,30 @@
+aws:
+  dynamodb:
+    secretKey: AHjhDRVFVL0Ay+OaAVCjlbFhDjqEMOoBFj6TmE7F
+    accessKey: AKIARJIYID7MVXUQCPYT
+    region: ap-northeast-1
+
+  s3:
+    frequency: 10
+    size: 800
+    accessKey: AKIARJIYID7MUNBXC33O
+    secretKey: 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
+    bucket_name: tajammulbucket123
+
+namaz:
+  method:
+    url: https://api.aladhan.com/v1/methods
+
+  time:
+    url: https://api.aladhan.com/v1/calendar
+
+email:
+  password: uhhagukcgvlyugsr
+  from: virtualdoctorlimited@gmail.com
+
+jwt:
+  secret:
+    key: 3677397A24432646294A404E635266546A576E5A7234753778214125442A472D
+
+server:
+  port: 5000

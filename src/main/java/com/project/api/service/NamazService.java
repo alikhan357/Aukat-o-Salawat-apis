@@ -1,7 +1,10 @@
 package com.project.api.service;
 
 import com.project.api.dto.request.NamazTimeRequest;
+import com.project.api.dto.response.MethodsDTO;
+import com.project.api.dto.response.MethodsResponseDTO;
 import com.project.api.dto.response.ServiceResponse;
+import com.project.api.helper.Constants;
 import com.project.api.helper.Helper;
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
@@ -14,6 +17,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class NamazService {
@@ -24,16 +30,32 @@ public class NamazService {
     @Value("${namaz.method.url}")
     private String NAMAZ_METHOD_URL ;
 
+
     public ServiceResponse getNamazMethods() {
         try {
-            HttpResponse<JsonNode> response = Unirest.get(NAMAZ_METHOD_URL).asJson();
+            MethodsResponseDTO response = new MethodsResponseDTO();
+            List<MethodsDTO> methods = new ArrayList<>();
+            List<MethodsDTO> schools = new ArrayList<>();
 
-            if (response.isSuccess()) {
-                JSONObject responseData = response.getBody().getObject().getJSONObject("data");
-                return new ServiceResponse(HttpStatus.OK.value(), "SUCCESS", responseData.toString());
-            } else {
-                return new ServiceResponse(response.getStatus(), "Unable to fetch calculation methods", null);
-            }
+             int i = 0;
+
+             for(String method : Constants.methods){
+                 if(!method.equals("")) {
+                     MethodsDTO dto = new MethodsDTO();
+                     dto.setId(i++);
+                     dto.setName(method);
+                     methods.add(dto);
+                 }
+             }
+
+             schools.add(new MethodsDTO("Shaafi (standard)",0));
+             schools.add(new MethodsDTO("Hanafi",1));
+
+             response.setMethods(methods);
+             response.setSchools(schools);
+
+            return new ServiceResponse(HttpStatus.OK.value(), "SUCCESS", response);
+
         } catch (Exception e) {
             return new ServiceResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(), null);
         }

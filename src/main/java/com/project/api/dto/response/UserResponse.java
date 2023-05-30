@@ -13,4 +13,8 @@ public class UserResponse {
     private String lastname;
     private String macAddress;
     private String email;
+    private MethodsDTO method;
+    private MethodsDTO school;
+    private Double lat;
+    private Double lng;
 }

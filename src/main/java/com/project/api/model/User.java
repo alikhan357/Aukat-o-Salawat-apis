@@ -32,6 +32,18 @@ public class User implements UserDetails {
     @DynamoDBAttribute
     private String password;
 
+    @DynamoDBAttribute
+    private Method method;
+
+    @DynamoDBAttribute
+    private School school;
+
+    @DynamoDBAttribute
+    private Double lat;
+
+    @DynamoDBAttribute
+    private Double lng;
+
     @Override
     @DynamoDBIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {

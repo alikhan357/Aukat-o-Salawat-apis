@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 @RestController
 @RequestMapping("/api/v1/users")
@@ -29,6 +30,18 @@ public class UserController {
     @PutMapping("/reset-password")
     public ResponseEntity<ServiceResponse> updatePassword(@RequestBody PasswordRequest request){
         ServiceResponse resp = userService.updatePassword(request);
+        return ResponseEntity.status(resp.getCode()).body(resp);
+    }
+
+    @PutMapping("/method")
+    public ResponseEntity<ServiceResponse> updateMethod(@RequestParam("method") Integer method, @RequestParam("school") Integer school, Principal principal){
+        ServiceResponse resp = userService.updateMethod(method,school,principal);
+        return ResponseEntity.status(resp.getCode()).body(resp);
+    }
+
+    @PutMapping("/location")
+    public ResponseEntity<ServiceResponse> updateLocation(@RequestParam("lat") Double lat, @RequestParam("lng") Double lng, Principal principal){
+        ServiceResponse resp = userService.updateLocation(lat,lng,principal);
         return ResponseEntity.status(resp.getCode()).body(resp);
     }
 

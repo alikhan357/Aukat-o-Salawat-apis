@@ -1,17 +1,18 @@
 package com.project.api.dto.response;
 
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
 
-@NoArgsConstructor
 @Getter
 @Setter
-public class PlaylistDTO {
+@NoArgsConstructor
+public class MethodsResponseDTO {
 
-    private List<AudioDTO> audios;
-    private String createdDate;
-    private String updatedDate;
+    List<MethodsDTO> methods;
+    List<MethodsDTO> schools;
+
 }
