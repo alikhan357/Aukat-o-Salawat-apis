@@ -19,4 +19,6 @@ public class ReminderDTO {
     private String type;
     private String time;
     private String namaz;
+    private Boolean isEnabled;
+    private Integer adjustedTime;
 }

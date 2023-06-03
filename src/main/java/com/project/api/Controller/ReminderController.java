@@ -1,6 +1,7 @@
 package com.project.api.Controller;
 
 import com.project.api.dto.request.NamazTimeRequest;
+import com.project.api.dto.response.ReminderDTO;
 import com.project.api.dto.response.ServiceResponse;
 import com.project.api.model.Reminder;
 import com.project.api.service.NamazService;
@@ -19,7 +20,7 @@ public class ReminderController {
     private final ReminderService reminderService;
 
     @PostMapping("/save")
-    public ResponseEntity<ServiceResponse> save(@RequestBody Reminder reminder, Principal principal){
+    public ResponseEntity<ServiceResponse> save(@RequestBody ReminderDTO reminder, Principal principal){
         ServiceResponse response = reminderService.save(reminder,principal);
         return ResponseEntity.status(response.getCode()).body(response);
     }

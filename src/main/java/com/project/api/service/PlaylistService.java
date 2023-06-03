@@ -156,6 +156,29 @@ public class PlaylistService {
         }
     }
 
+    public ServiceResponse markAudioAsFav(Principal principal,List<String> id){
+
+        try {
+            Optional<Playlist> playlist = playlistRepository.findByEmail(principal.getName());
+            if(playlist.isPresent()) {
+                playlist.get().getAudios().forEach(d -> {
+                     d.setIsFav(Boolean.FALSE);
+                    if(id.contains(d.getId())){
+                        d.setIsFav(Boolean.TRUE);
+                    }
+                });
+                playlistRepository.save(playlist.get());
+                return new ServiceResponse(HttpStatus.OK.value(), "SUCCESS", null);
+            }
+            else
+                return new ServiceResponse(HttpStatus.NOT_FOUND.value(),"User does not have a playlist",null);
+        }
+        catch (Exception ex){
+            return new ServiceResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),ex.getMessage(),null);
+        }
+    }
+
+
     public ServiceResponse getFavAudio(Principal principal) {
 
         try {

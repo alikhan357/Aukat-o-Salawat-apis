@@ -13,4 +13,5 @@ public class MethodsDTO {
 
     private String name;
     private Integer id;
+    private Boolean isDefault = Boolean.FALSE;
 }

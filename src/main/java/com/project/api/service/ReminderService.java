@@ -4,6 +4,7 @@ import com.project.api.dto.response.ReminderDTO;
 import com.project.api.dto.response.ServiceResponse;
 import com.project.api.model.Reminder;
 import com.project.api.repository.ReminderRepository;
+import com.project.api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -24,20 +25,22 @@ public class ReminderService {
     private final ModelMapper modelMapper;
 
 
-    public ServiceResponse save(Reminder reminder, Principal principal){
+
+    public ServiceResponse save(ReminderDTO reminder, Principal principal){
 
         try{
             Optional<Reminder> reminderDb =  repository.findByEmailAndNamaz(principal.getName(), reminder.getNamaz());
 
+            Reminder reminderObj = this.modelMapper.map(reminder,Reminder.class);
+
+
             if(!reminderDb.isPresent()) {
-                reminder.setEmail(principal.getName());
-                repository.save(reminder);
+                reminderObj.setId(reminderDb.get().getId());
             }
             else{
-                Reminder updatedReminder =  reminderDb.get();
-                updatedReminder.setAudioFile(reminder.getAudioFile());
-                updatedReminder.setTime(reminder.getTime());
-                repository.update(updatedReminder);
+                reminderObj.setEmail(principal.getName());
+                reminderObj.setAdjustedTime(reminderObj.getAdjustedTime() == null ? 0 : reminderObj.getAdjustedTime());
+                repository.update(reminderObj);
             }
 
             return new ServiceResponse(HttpStatus.OK.value(),"SUCCESS",null);
@@ -53,7 +56,6 @@ public class ReminderService {
             Optional<List<Reminder>> reminderDb =  repository.findByEmail(principal.getName());
 
             if(reminderDb.isPresent()) {
-                modelMapper.map(reminderDb.get(), new TypeToken<List<ReminderDTO>>(){}.getType());
                return new ServiceResponse(HttpStatus.OK.value(), "SUCCESS",
                        modelMapper.map(reminderDb.get(), new TypeToken<List<ReminderDTO>>(){}.getType()));
             }

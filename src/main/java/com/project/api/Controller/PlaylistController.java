@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/playlist")
@@ -35,6 +36,13 @@ public class PlaylistController {
         ServiceResponse response = playlistService.markAudioAsFav(principal,id);
         return ResponseEntity.status(response.getCode()).body(response);
     }
+
+    @PostMapping("/audio/fav")
+    public ResponseEntity<ServiceResponse> favoriteAudio(Principal principal,@RequestBody List<String> ids){
+        ServiceResponse response = playlistService.markAudioAsFav(principal,ids);
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
 
     @GetMapping("/audio/fav")
     public ResponseEntity<ServiceResponse> favoriteAudio(Principal principal){
