@@ -33,14 +33,16 @@ public class ReminderService {
 
             Reminder reminderObj = this.modelMapper.map(reminder,Reminder.class);
 
+            reminderObj.setEmail(principal.getName());
+            reminderObj.setAdjustedTime(reminderObj.getAdjustedTime() == null ? 0 : reminderObj.getAdjustedTime());
 
-            if(!reminderDb.isPresent()) {
+            if(reminderDb.isPresent()) {
                 reminderObj.setId(reminderDb.get().getId());
+                repository.update(reminderObj);
             }
             else{
-                reminderObj.setEmail(principal.getName());
-                reminderObj.setAdjustedTime(reminderObj.getAdjustedTime() == null ? 0 : reminderObj.getAdjustedTime());
-                repository.update(reminderObj);
+
+                repository.save(reminderObj);
             }
 
             return new ServiceResponse(HttpStatus.OK.value(),"SUCCESS",null);

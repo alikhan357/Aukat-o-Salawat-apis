@@ -35,6 +35,7 @@ public class Reminder {
     private String time;
 
     @NonNull
+    @DynamoDBAttribute
     private String namaz;
 
     @DynamoDBAttribute
