@@ -86,6 +86,14 @@ public class NamazService {
                 request.setSchool(Long.valueOf(user.getSchool().getId()));
             }
 
+            if(user.getLat()!=null){
+                request.setLat(user.getLat());
+            }
+
+            if(user.getLng()!=null){
+                request.setLat(user.getLng());
+            }
+
             String formattedUrl = Helper.formatTimingsURL(NAMAZ_TIME_URL, request);
             HttpResponse<JsonNode> response = Unirest.get(formattedUrl).asJson();
 

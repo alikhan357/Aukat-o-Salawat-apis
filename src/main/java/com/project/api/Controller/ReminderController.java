@@ -31,6 +31,12 @@ public class ReminderController {
         return ResponseEntity.status(response.getCode()).body(response);
     }
 
+    @PostMapping("/")
+    public ResponseEntity<ServiceResponse> getReminders(@RequestBody NamazTimeRequest request, Principal principal){
+        ServiceResponse response = reminderService.getReminders(request,principal);
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
 
 }
 
