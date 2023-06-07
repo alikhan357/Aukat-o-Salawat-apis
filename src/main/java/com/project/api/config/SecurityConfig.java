@@ -43,7 +43,7 @@ public class SecurityConfig {
                 .csrf()
                 .disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/api/v1/auth/**","/api/v1/otp/validate","/api/v1/otp/generate","/api/v1/otp/alexa/validate","/api/v1/device/**")
+                .requestMatchers("/api/v1/auth/**","/api/v1/otp/validate","/api/v1/otp/generate","/api/v1/otp/alexa/validate","/api/v1/device/**","/api/v1/reminder/pi/reminders/*")
                 .permitAll()
                 .anyRequest()
                 .authenticated()

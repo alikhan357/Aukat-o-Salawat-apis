@@ -13,6 +13,7 @@ import kong.unirest.json.JSONObject;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.Banner;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,8 @@ public class ReminderService {
 
     private final NamazService namazService;
 
+    @Value("${aws.s3.url}")
+    private String s3Url;
 
 
     public ServiceResponse save(ReminderDTO reminder, Principal principal){
@@ -40,10 +43,16 @@ public class ReminderService {
         try{
             Optional<Reminder> reminderDb =  repository.findByEmailAndNamaz(principal.getName(), reminder.getNamaz());
 
+            if(reminder.getIsEnabled()){
+                assert reminder.getTime() != null : "Reminder time cannot be empty";
+                assert reminder.getAudioFile()!=null : "Please select audio before enabling reminder";
+            }
+
             Reminder reminderObj = this.modelMapper.map(reminder,Reminder.class);
 
             reminderObj.setEmail(principal.getName());
             reminderObj.setAdjustedTime(reminderObj.getAdjustedTime() == null ? 0 : reminderObj.getAdjustedTime());
+            reminderObj.setAudioUrl(s3Url + reminder.getAudioFile());
 
             if(reminderDb.isPresent()) {
                 reminderObj.setId(reminderDb.get().getId());
@@ -61,10 +70,10 @@ public class ReminderService {
     }
 
 
-    public ServiceResponse getReminders(Principal principal){
+    public ServiceResponse getReminders(String email){
 
         try{
-            Optional<List<Reminder>> reminderDb =  repository.findByEmail(principal.getName());
+            Optional<List<Reminder>> reminderDb =  repository.findByEmail(email);
 
             if(reminderDb.isPresent()) {
                return new ServiceResponse(HttpStatus.OK.value(), "SUCCESS",

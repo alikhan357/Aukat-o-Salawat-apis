@@ -44,5 +44,8 @@ public class Reminder {
     @DynamoDBAttribute
     private Integer adjustedTime;
 
+    @DynamoDBAttribute
+    private String audioUrl;
+
 
 }

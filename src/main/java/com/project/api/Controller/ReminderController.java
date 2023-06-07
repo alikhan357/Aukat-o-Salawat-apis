@@ -27,13 +27,19 @@ public class ReminderController {
 
     @GetMapping("/")
     public ResponseEntity<ServiceResponse> get(Principal principal){
-        ServiceResponse response = reminderService.getReminders(principal);
+        ServiceResponse response = reminderService.getReminders(principal.getName());
         return ResponseEntity.status(response.getCode()).body(response);
     }
 
     @PostMapping("/")
     public ResponseEntity<ServiceResponse> getReminders(@RequestBody NamazTimeRequest request, Principal principal){
         ServiceResponse response = reminderService.getReminders(request,principal);
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+    @GetMapping("/pi/reminders/{email}")
+    public ResponseEntity<ServiceResponse> getPiReminders(@PathVariable String email){
+        ServiceResponse response = reminderService.getReminders(email);
         return ResponseEntity.status(response.getCode()).body(response);
     }
 

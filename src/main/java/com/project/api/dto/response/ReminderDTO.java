@@ -21,4 +21,5 @@ public class ReminderDTO {
     private String namaz;
     private Boolean isEnabled;
     private Integer adjustedTime;
+    private String audioUrl;
 }
