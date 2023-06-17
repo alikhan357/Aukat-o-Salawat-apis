@@ -37,7 +37,7 @@ def getReminders():
         data = response.json()['data']
         for d in data:
             if d["isEnabled"]:
-                download_mp3(d["audioUrl"],"audio/" + d["audioFile"])
+                download_mp3(d["audioUrl"],AUDIO_PATH + d["audioFile"])
                 output.append(d)
 
     else:
@@ -77,16 +77,16 @@ def getserial():
   return cpuserial
 
 
-REMINDERS_API_URL = os.environ.get("NAMAZ_API","http://localhost:5000") + "/api/v1/reminder/pi/reminders/{}"
+REMINDERS_API_URL = "http://aukat-o-salawat-api.ap-northeast-1.elasticbeanstalk.com" + "/api/v1/reminder/pi/reminders/{}"
 serial_number = getserial()
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
-logname = "app_{}.log".format(serial_number)
+logname = "/home/pi/Script/app_{}.log".format(serial_number)
 handler = TimedRotatingFileHandler(logname, when="midnight", backupCount=30)
 handler.suffix = "%Y%m%d"
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
-
+AUDIO_PATH = "/home/pi/Script/audio/"
