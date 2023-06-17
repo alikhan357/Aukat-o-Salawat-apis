@@ -14,6 +14,8 @@ import kong.unirest.Unirest;
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -31,66 +33,76 @@ public class NamazService {
     private String NAMAZ_TIME_URL;
 
     @Value("${namaz.method.url}")
-    private String NAMAZ_METHOD_URL ;
+    private String NAMAZ_METHOD_URL;
 
     private final UserRepository userRepository;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(NamazService.class);
 
-
+    /**
+     * Retrieves the available namaz methods and schools.
+     *
+     * @param principal The principal object representing the authenticated user.
+     * @return ServiceResponse object containing the list of namaz methods and schools.
+     */
     public ServiceResponse getNamazMethods(Principal principal) {
         try {
             MethodsResponseDTO response = new MethodsResponseDTO();
             List<MethodsDTO> methods = new ArrayList<>();
             List<MethodsDTO> schools = new ArrayList<>();
+            int i = 0;
 
-             int i = 0;
+            User user = userRepository.findByEmail(principal.getName()).get();
 
-             User user = userRepository.findByEmail(principal.getName()).get();
+            for (String method : Constants.methods) {
+                if (!method.equals("")) {
+                    MethodsDTO dto = new MethodsDTO();
+                    dto.setId(i++);
+                    dto.setName(method);
+                    if (user.getMethod() != null && user.getMethod().getId() == i)
+                        dto.setIsDefault(true);
+                    methods.add(dto);
+                }
+            }
 
-             for(String method : Constants.methods){
-                 if(!method.equals("")) {
-                     MethodsDTO dto = new MethodsDTO();
-                     dto.setId(i++);
-                     dto.setName(method);
-                     if(user.getMethod()!=null && user.getMethod().getId() == i)
-                         dto.setIsDefault(true);
-                     methods.add(dto);
-                 }
-             }
+            schools.add(new MethodsDTO("Shaafi (standard)", 0, true));
+            schools.add(new MethodsDTO("Hanafi", 1, false));
 
-             schools.add(new MethodsDTO("Shaafi (standard)",0,true));
-             schools.add(new MethodsDTO("Hanafi",1,false));
-
-             response.setMethods(methods);
-             response.setSchools(schools);
+            response.setMethods(methods);
+            response.setSchools(schools);
 
             return new ServiceResponse(HttpStatus.OK.value(), "SUCCESS", response);
-
         } catch (Exception e) {
+            LOGGER.error("Error occurred while retrieving namaz methods: {}", e.getMessage());
             return new ServiceResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(), null);
         }
     }
 
+    /**
+     * Retrieves the namaz timings based on the provided request.
+     *
+     * @param request   The NamazTimeRequest object containing the request parameters.
+     * @param principal The principal object representing the authenticated user.
+     * @return ServiceResponse object containing the namaz timings.
+     */
     public ServiceResponse getNamazTimings(@RequestBody NamazTimeRequest request, Principal principal) {
-
         try {
-
-            //check user's default method/school
             User user = userRepository.findByEmail(principal.getName()).get();
 
-            if(user.getMethod()!=null){
+            // Set user's default method/school, lat, and lng if available
+            if (user.getMethod() != null) {
                 request.setMethod(Long.valueOf(user.getMethod().getId()));
             }
 
-            if(user.getSchool()!=null){
+            if (user.getSchool() != null) {
                 request.setSchool(Long.valueOf(user.getSchool().getId()));
             }
 
-            if(user.getLat()!=null){
+            if (user.getLat() != null) {
                 request.setLat(user.getLat());
             }
 
-            if(user.getLng()!=null){
+            if (user.getLng() != null) {
                 request.setLat(user.getLng());
             }
 
@@ -102,9 +114,11 @@ public class NamazService {
                 JSONObject timings = data.getJSONObject(Helper.getDayFromDate(request.getTimeZone()) - 1).getJSONObject("timings");
                 return new ServiceResponse(HttpStatus.OK.value(), "SUCCESS", timings.toString());
             } else {
+                LOGGER.error("Failed to fetch namaz timings. Status: {}", response.getStatus());
                 return new ServiceResponse(response.getStatus(), "Unable to fetch namaz timings", null);
             }
         } catch (Exception e) {
+            LOGGER.error("Error occurred while retrieving namaz timings: {}", e.getMessage());
             return new ServiceResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(), null);
         }
     }

@@ -7,6 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
+@ToString
 public class OTPValidateRequest {
 
     String email;

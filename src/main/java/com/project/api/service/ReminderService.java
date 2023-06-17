@@ -5,16 +5,17 @@ import com.project.api.dto.request.NamazTimeRequest;
 import com.project.api.dto.response.ReminderDTO;
 import com.project.api.dto.response.ServiceResponse;
 import com.project.api.helper.Constants;
-import com.project.api.helper.Helper;
 import com.project.api.model.Reminder;
+import com.project.api.model.User;
 import com.project.api.repository.ReminderRepository;
 import com.project.api.repository.UserRepository;
 import kong.unirest.json.JSONObject;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.Banner;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -29,60 +30,74 @@ import java.util.stream.Collectors;
 public class ReminderService {
 
     private final ReminderRepository repository;
-
     private final ModelMapper modelMapper;
-
     private final NamazService namazService;
+
+    private final UserRepository userRepository;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReminderService.class);
 
     @Value("${aws.s3.url}")
     private String s3Url;
 
+    public ServiceResponse save(ReminderDTO reminder, Principal principal) {
+        try {
 
-    public ServiceResponse save(ReminderDTO reminder, Principal principal){
+            //fetch user
+            Optional<User> user = userRepository.findByEmail(principal.getName());
 
-        try{
-            Optional<Reminder> reminderDb =  repository.findByEmailAndNamaz(principal.getName(), reminder.getNamaz());
+            Optional<Reminder> reminderDb = repository.findByEmailAndNamaz(principal.getName(), reminder.getNamaz());
 
-            if(reminder.getIsEnabled()){
+            if (reminder.getIsEnabled()) {
                 assert reminder.getTime() != null : "Reminder time cannot be empty";
-                assert reminder.getAudioFile()!=null : "Please select audio before enabling reminder";
+                assert reminder.getAudioFile() != null : "Please select audio before enabling reminder";
+                assert user.get().getTimeZone() != null : "Please update you location";
             }
 
-            Reminder reminderObj = this.modelMapper.map(reminder,Reminder.class);
+            Reminder reminderObj = modelMapper.map(reminder, Reminder.class);
 
             reminderObj.setEmail(principal.getName());
             reminderObj.setAdjustedTime(reminderObj.getAdjustedTime() == null ? 0 : reminderObj.getAdjustedTime());
             reminderObj.setAudioUrl(s3Url + reminder.getAudioFile());
+            reminderObj.setTimeZone(user.get().getTimeZone());
 
-            if(reminderDb.isPresent()) {
+            if (reminderDb.isPresent()) {
                 reminderObj.setId(reminderDb.get().getId());
                 repository.update(reminderObj);
-            }
-            else{
-
+            } else {
                 repository.save(reminderObj);
             }
 
-            return new ServiceResponse(HttpStatus.OK.value(),"SUCCESS",null);
-        }catch (Exception e) {
-            return new ServiceResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),e.getMessage(),null);
+            return new ServiceResponse(HttpStatus.OK.value(), "SUCCESS", null);
+        } catch (Exception e) {
+            LOGGER.error("Error occurred while saving reminder: {}", e.getMessage());
+            return new ServiceResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(), null);
         }
     }
 
+    public ServiceResponse getReminders(String serial){
+        try {
+            //fetch user
+            Optional<User> user = userRepository.findBySerial(serial);
+            if(user.isPresent()) {
+                String email = user.get().getEmail();
+                Optional<List<Reminder>> reminderDb = repository.findByEmail(user.get().getEmail());
 
-    public ServiceResponse getReminders(String email){
-
-        try{
-            Optional<List<Reminder>> reminderDb =  repository.findByEmail(email);
-
-            if(reminderDb.isPresent()) {
-               return new ServiceResponse(HttpStatus.OK.value(), "SUCCESS",
-                       modelMapper.map(reminderDb.get(), new TypeToken<List<ReminderDTO>>(){}.getType()));
+                if (reminderDb.isPresent()) {
+                    List<ReminderDTO> reminderDTOs = modelMapper.map(reminderDb.get(), new TypeToken<List<ReminderDTO>>() {
+                    }.getType());
+                    LOGGER.info("Retrieved reminders for email: {}", email);
+                    return new ServiceResponse(HttpStatus.OK.value(), "SUCCESS", reminderDTOs);
+                } else {
+                    LOGGER.warn("No reminders exist for email: {}", email);
+                    return new ServiceResponse(HttpStatus.NOT_FOUND.value(), "No reminders exist", null);
+                }
             }
-            else
-                return new ServiceResponse(HttpStatus.NOT_FOUND.value(), "No Reminders Exist!",null);
-        }catch (Exception e) {
-            return new ServiceResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),e.getMessage(),null);
+            LOGGER.warn("No User exist for serial: {}", serial);
+            return new ServiceResponse(HttpStatus.NOT_FOUND.value(), "User does not exist against serial", null);
+        } catch (Exception e) {
+            LOGGER.error("Error occurred while retrieving reminders: {}", e.getMessage());
+            return new ServiceResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(), null);
         }
     }
 
@@ -94,46 +109,47 @@ public class ReminderService {
             // Retrieve namaz timings
             ServiceResponse response = namazService.getNamazTimings(request, principal);
 
-            if (response.getCode() != 200) {
+            if (response.getCode() != HttpStatus.OK.value()) {
+                LOGGER.warn("Error occurred while retrieving namaz timings: {}", response.getMessage());
                 return response;
             }
 
-            JSONObject object = new JSONObject((String)(response.getData()));
+            JSONObject namazTimings = new JSONObject(response.getData().toString());
 
             // Map Reminder entities to ReminderDTOs if present, otherwise use an empty list
             List<ReminderDTO> reminders = (List<ReminderDTO>) reminderDb.map(r -> modelMapper.map(r, new TypeToken<List<ReminderDTO>>(){}.getType()))
                     .orElseGet(ArrayList::new);
+            // Create empty reminders for missing namaz
+            List<ReminderDTO> emptyReminders = createEmptyReminders(namazTimings, reminders);
 
-            // Create empty reminders
-            List<ReminderDTO> emptyReminders = createEmptyReminders(object, reminders);
-
-            return new ServiceResponse(HttpStatus.OK.value(), "Success", emptyReminders);
+            LOGGER.info("Retrieved reminders for user: {}", principal.getName());
+            return new ServiceResponse(HttpStatus.OK.value(), "SUCCESS", emptyReminders);
         } catch (Exception e) {
-            // Return error response if an exception occurs
+            LOGGER.error("Error occurred while retrieving reminders: {}", e.getMessage());
             return new ServiceResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(), null);
         }
     }
 
-    private List<ReminderDTO> createEmptyReminders(JSONObject object, List<ReminderDTO> exclude) {
-        List<ReminderDTO> list = new ArrayList<>();
+    private List<ReminderDTO> createEmptyReminders(JSONObject namazTimings, List<ReminderDTO> reminders) {
+        List<ReminderDTO> emptyReminders = new ArrayList<>();
 
-        List<String> namazReminders = exclude.stream().map(ReminderDTO::getNamaz).toList();
+        List<String> namazReminders = reminders.stream().map(ReminderDTO::getNamaz).collect(Collectors.toList());
 
         // Create empty reminders for each namaz
         for (String namaz : Constants.namaz) {
             if (!namazReminders.contains(namaz)) {
-                ReminderDTO dto = new ReminderDTO();
-                dto.setNamaz(namaz);
-                dto.setAdjustedTime(0);
-                dto.setIsEnabled(false);
-                dto.setTime(object.getString(namaz));
-                list.add(dto);
+                ReminderDTO emptyReminder = new ReminderDTO();
+                emptyReminder.setNamaz(namaz);
+                emptyReminder.setAdjustedTime(0);
+                emptyReminder.setIsEnabled(false);
+                emptyReminder.setTime(namazTimings.getString(namaz));
+                emptyReminders.add(emptyReminder);
+            } else {
+                ReminderDTO reminder = reminders.stream().filter(r -> r.getNamaz().equalsIgnoreCase(namaz)).findFirst().get();
+                emptyReminders.add(reminder);
             }
-            else
-                list.add(exclude.stream().filter(x -> x.getNamaz().equalsIgnoreCase(namaz)).findFirst().get());
-
         }
 
-        return list;
+        return emptyReminders;
     }
 }

@@ -47,5 +47,8 @@ public class Reminder {
     @DynamoDBAttribute
     private String audioUrl;
 
+    @DynamoDBAttribute
+    private String timeZone;
+
 
 }

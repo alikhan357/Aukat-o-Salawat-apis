@@ -37,6 +37,18 @@ public class UserRepository {
         return user.size() == 0 ? Optional.empty() : Optional.of(user.get(0));
     }
 
+    public Optional<User> findBySerial(String serial){
+        DynamoDBScanExpression expression = new DynamoDBScanExpression();
+        expression.addFilterCondition("serialNumber",new Condition()
+                .withComparisonOperator(ComparisonOperator.EQ)
+                .withAttributeValueList(new AttributeValue().withS(serial))
+        );
+
+        List<User> user = dynamoDBMapper.scan(User.class,expression);
+
+        return user.size() == 0 ? Optional.empty() : Optional.of(user.get(0));
+    }
+
     public void delete(Integer id){
         dynamoDBMapper.delete(dynamoDBMapper.load(User.class,id));
     }

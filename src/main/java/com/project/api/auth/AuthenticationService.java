@@ -7,6 +7,9 @@ import com.project.api.dto.response.AuthenticationResponse;
 import com.project.api.model.User;
 import com.project.api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,6 +25,8 @@ public class AuthenticationService {
 
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationService.class);
     public AuthenticationResponse register(RegisterRequest request) {
 
         var user = User.builder()
@@ -32,6 +37,8 @@ public class AuthenticationService {
                 .build();
 
         userRepository.save(user);
+
+        LOGGER.info("User {} Successfully registered",request.getEmail());
 
         return getAuthenticationResponse(user);
 
@@ -44,6 +51,8 @@ public class AuthenticationService {
 
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(()-> new UsernameNotFoundException("User not found"));
+
+        LOGGER.info("{} authenticated ",user.getEmail());
 
         return getAuthenticationResponse(user);
     }

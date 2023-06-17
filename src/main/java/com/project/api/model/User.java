@@ -26,7 +26,7 @@ public class User implements UserDetails {
     @DynamoDBAttribute
     private String lastname;
     @DynamoDBAttribute
-    private String macAddress;
+    private String serialNumber;
     @DynamoDBAttribute
     private String email;
     @DynamoDBAttribute
@@ -43,6 +43,9 @@ public class User implements UserDetails {
 
     @DynamoDBAttribute
     private Double lng;
+
+    @DynamoDBAttribute
+    private String timeZone;
 
     @Override
     @DynamoDBIgnore

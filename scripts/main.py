@@ -1,28 +1,26 @@
 import schedule
 import time
-from helper import getReminders, play,add_subtract_time
+from helper import getReminders, play,add_subtract_time,logger
 from pytz import timezone
 
 # Dictionary to store reminder times for each namaz
 reminders_times = {}
 
-# User email and default timezone
-email = "aliammarkhanbitw@gmail.com"
-default_timezone = "Asia/Karachi"
 
 # Path format for audio files
 audio_path = "audio/{}"
 
 # Function to execute the reminder job
-def job(audio):
-    print("Reminder executed")
-    play(audio=audio)
+def job(params):
+    logger.info("Reminder executed for {}".format(params["namaz_name"]))
+    play(audio=params["audio"])
+    logger.info("Reminder Completed")
 
 # Function to update reminders
 def updateReminders():
     # Fetch reminders
-    print("Updating reminders")
-    reminders = getReminders(email=email)
+    logger.info("Updating reminders")
+    reminders = getReminders()
 
     if len(reminders) > 0:
         for reminder in reminders:
@@ -32,20 +30,24 @@ def updateReminders():
                 # Clear any existing reminder for the namaz
                 schedule.clear(reminder["namaz"])
                 # Schedule a new reminder at the specified time in the default timezone
-                schedule.every().day.at(time, timezone(default_timezone)).do(
-                    job, audio=audio_path.format(reminder["audioFile"])
+                schedule.every().day.at(time, timezone(reminder["timeZone"])).do(
+                    job, {"audio" : audio_path.format(reminder["audioFile"]), "namaz_name":reminder["namaz"]}
                 ).tag(reminder["namaz"])
                 reminders_times[reminder["namaz"]] = time
-                print("{} reminder updated".format(reminder["namaz"]))
+                
+                logger.info("{} reminder updated.".format(reminder["namaz"]))
+                logger.info("Time :{}".format(time))
+                logger.info("TimeZone :{}".format(reminder["timeZone"]))
+            
             else:
-                print("{} reminder already updated".format(reminder["namaz"]))
+                logger.info("{} reminder already updated".format(reminder["namaz"]))
     else:
-        print("No reminders found")
+        logger.info("No reminders found")
 
 # Main execution
 if __name__ == "__main__":
     # Schedule a job to run every 1800 seconds (30 minutes)
-    #schedule.every(1800).seconds.do(updateReminders)
+    schedule.every(1800).seconds.do(updateReminders)
     updateReminders()
 
     while True:

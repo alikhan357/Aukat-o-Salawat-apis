@@ -1,7 +1,8 @@
 package com.project.api.dto.response;
 
+import lombok.ToString;
 import org.springframework.http.HttpStatus;
-
+@ToString
 public class ServiceResponse {
 
     public ServiceResponse() {

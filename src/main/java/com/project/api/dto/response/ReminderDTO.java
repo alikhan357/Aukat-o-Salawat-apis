@@ -12,7 +12,7 @@ import org.springframework.lang.NonNull;
 @Getter
 @Setter
 @NoArgsConstructor
-
+@ToString
 public class ReminderDTO {
 
     private String audioFile;
@@ -22,4 +22,5 @@ public class ReminderDTO {
     private Boolean isEnabled;
     private Integer adjustedTime;
     private String audioUrl;
+    private String timeZone;
 }
