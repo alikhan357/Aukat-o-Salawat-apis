@@ -63,7 +63,7 @@ def add_subtract_time(time_str, minutes):
 
 def getserial():
   # Extract serial from cpuinfo file
-  return "00000000b3cd5dd0"
+  #return "00000000b3cd5dd0"
   cpuserial = "0000000000000000"
   try:
     f = open('/proc/cpuinfo','r')
