@@ -1,15 +1,22 @@
+
 import os
 import requests
-from preferredsoundplayer import soundplay
+#from preferredsoundplayer import soundplay
 import time
 from datetime import datetime, timedelta
 import os
 import logging
 from logging.handlers import TimedRotatingFileHandler
-
+import subprocess
+from subprocess import PIPE
 
 def play(audio):
-    soundplay(audio,1)
+    #soundplay(audio,1)
+    #time.sleep(600000)
+    P = subprocess.Popen("ffplay -nodisp -autoexit -loglevel quiet {}".format(audio), universal_newlines=True,shell=True, stdout=PIPE, stderr=PIPE).communicate()
+   
+  
+
 
 
 def download_mp3(url, save_path):

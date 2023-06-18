@@ -12,11 +12,13 @@ audio_path = AUDIO_PATH + "{}"
 
 # Function to execute the reminder job
 def job(params):
-   
     try:
+    
         logger.info("Reminder executed for {}".format(params["namaz_name"]))
+        logger.info("Playing file {}".format(params["audio"]))
         play(audio=params["audio"])
         logger.info("Reminder Completed")
+    
     except Exception as err:
         logger.error("Exception occured {}".format(err))
 
@@ -48,7 +50,7 @@ def updateReminders():
                     logger.info("{} reminder already updated".format(reminder["namaz"]))
         else:
             logger.info("No reminders found")
-
+    
     except Exception as err:
         logger.error("Exception occured {}".format(err))
 
