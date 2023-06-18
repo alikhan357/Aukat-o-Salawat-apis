@@ -5,6 +5,7 @@ import com.project.api.dto.request.NamazTimeRequest;
 import com.project.api.dto.response.ReminderDTO;
 import com.project.api.dto.response.ServiceResponse;
 import com.project.api.helper.Constants;
+import com.project.api.helper.Helper;
 import com.project.api.model.Reminder;
 import com.project.api.model.User;
 import com.project.api.repository.ReminderRepository;
@@ -60,6 +61,8 @@ public class ReminderService {
             reminderObj.setAdjustedTime(reminderObj.getAdjustedTime() == null ? 0 : reminderObj.getAdjustedTime());
             reminderObj.setAudioUrl(s3Url + reminder.getAudioFile());
             reminderObj.setTimeZone(user.get().getTimeZone());
+            reminderObj.setCreatedDate(Helper.getCurrentDateByTimezone(user.get().getTimeZone()));
+            reminderObj.setUpdatedDate(reminderObj.getCreatedDate());
 
             if (reminderDb.isPresent()) {
                 reminderObj.setId(reminderDb.get().getId());

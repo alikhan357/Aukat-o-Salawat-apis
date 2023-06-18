@@ -50,5 +50,11 @@ public class Reminder {
     @DynamoDBAttribute
     private String timeZone;
 
+    @DynamoDBAttribute
+    private String createdDate;
+
+    @DynamoDBAttribute
+    private String updatedDate;
+
 
 }

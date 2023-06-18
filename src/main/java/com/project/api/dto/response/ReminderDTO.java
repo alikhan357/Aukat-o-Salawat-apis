@@ -23,4 +23,6 @@ public class ReminderDTO {
     private Integer adjustedTime;
     private String audioUrl;
     private String timeZone;
+    private String createdDate;
+    private String updatedDate;
 }
