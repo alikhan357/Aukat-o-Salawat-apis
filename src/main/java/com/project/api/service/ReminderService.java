@@ -136,7 +136,7 @@ public class ReminderService {
     private List<ReminderDTO> createEmptyReminders(JSONObject namazTimings, List<ReminderDTO> reminders) {
         List<ReminderDTO> emptyReminders = new ArrayList<>();
 
-        List<String> namazReminders = reminders.stream().map(ReminderDTO::getNamaz).collect(Collectors.toList());
+        List<String> namazReminders = reminders.stream().map(ReminderDTO::getNamaz).toList();
 
         // Create empty reminders for each namaz
         for (String namaz : Constants.namaz) {

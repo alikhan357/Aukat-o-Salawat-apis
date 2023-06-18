@@ -85,7 +85,7 @@ public class NamazService {
      * @param principal The principal object representing the authenticated user.
      * @return ServiceResponse object containing the namaz timings.
      */
-    public ServiceResponse getNamazTimings(@RequestBody NamazTimeRequest request, Principal principal) {
+    public ServiceResponse getNamazTimings(NamazTimeRequest request, Principal principal) {
         try {
             User user = userRepository.findByEmail(principal.getName()).get();
 
@@ -121,5 +121,45 @@ public class NamazService {
             LOGGER.error("Error occurred while retrieving namaz timings: {}", e.getMessage());
             return new ServiceResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(), null);
         }
+    }
+
+    public JSONObject getNamazTimings(NamazTimeRequest request, String email){
+
+        try {
+            User user = userRepository.findByEmail(email).get();
+
+            // Set user's default method/school, lat, and lng if available
+            if (user.getMethod() != null) {
+                request.setMethod(Long.valueOf(user.getMethod().getId()));
+            }
+
+            if (user.getSchool() != null) {
+                request.setSchool(Long.valueOf(user.getSchool().getId()));
+            }
+
+            if (user.getLat() != null) {
+                request.setLat(user.getLat());
+            }
+
+            if (user.getLng() != null) {
+                request.setLng(user.getLng());
+            }
+
+            String formattedUrl = Helper.formatTimingsURL(NAMAZ_TIME_URL, request);
+            HttpResponse<JsonNode> response = Unirest.get(formattedUrl).asJson();
+
+            if (response.isSuccess()) {
+                JSONArray data = response.getBody().getObject().getJSONArray("data");
+                JSONObject timings = data.getJSONObject(Helper.getDayFromDate(request.getTimeZone()) - 1).getJSONObject("timings");
+                return timings;
+            } else {
+                LOGGER.error("Failed to fetch namaz timings. Status: {}", response.getStatus());
+
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error occurred while retrieving namaz timings: {}", e.getMessage());
+        }
+
+        return null;
     }
 }

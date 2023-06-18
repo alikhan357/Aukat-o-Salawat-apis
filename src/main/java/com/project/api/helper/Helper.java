@@ -56,4 +56,19 @@ public class Helper {
         return currentDate.format(formatter);
     }
 
+    /**
+     * IF date1 > date2 return +ve
+     * IF date1 < date2 return -ve
+     * else return 0
+     */
+    public static Integer compareDate(String date1String,String date2String){
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        LocalDate date1 = LocalDate.parse(date1String, formatter);
+        LocalDate date2 = LocalDate.parse(date2String, formatter);
+
+        return date1.compareTo(date2);
+    }
+
 }

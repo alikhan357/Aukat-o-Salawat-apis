@@ -68,4 +68,8 @@ public class UserRepository {
         User user = dynamoDBMapper.load(User.class,id);
         return user == null ? Optional.empty() : Optional.of(user);
     }
+
+    public List<User> findAll(){
+        return dynamoDBMapper.scan(User.class, new DynamoDBScanExpression());
+    }
 }

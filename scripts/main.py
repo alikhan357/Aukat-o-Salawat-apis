@@ -56,8 +56,8 @@ def updateReminders():
 
 # Main execution
 if __name__ == "__main__":
-    # Schedule a job to run every 1800 seconds (30 minutes)
-    schedule.every(1800).seconds.do(updateReminders)
+    # Schedule a job to run every 7200000 seconds (2 hours)
+    schedule.every(7200000).seconds.do(updateReminders)
     updateReminders()
 
     while True:
