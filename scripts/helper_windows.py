@@ -1,6 +1,7 @@
 
 import os
 import requests
+from preferredsoundplayer import soundplay
 import time
 from datetime import datetime, timedelta
 import os
@@ -10,9 +11,9 @@ import subprocess
 from subprocess import PIPE
 
 def play(audio):
-    #soundplay(audio,1)
+    soundplay(audio,1)
     #time.sleep(600000)
-    P = subprocess.Popen("ffplay -nodisp -autoexit -loglevel quiet {}".format(audio), universal_newlines=True,shell=True, stdout=PIPE, stderr=PIPE).communicate()
+    #P = subprocess.Popen("ffplay -nodisp -autoexit -loglevel quiet {}".format(audio), universal_newlines=True,shell=True, stdout=PIPE, stderr=PIPE).communicate()
    
   
 
@@ -69,6 +70,7 @@ def add_subtract_time(time_str, minutes):
 
 def getserial():
   # Extract serial from cpuinfo file
+  return "00000000b3cd5dd0"
   cpuserial = "0000000000000000"
   try:
     f = open('/proc/cpuinfo','r')
@@ -99,4 +101,4 @@ logger.addHandler(handler)
 #                     format='%(asctime)s %(message)s',
 #                     filemode='w')
  
-AUDIO_PATH = "/home/pi/Script/audio/"
+AUDIO_PATH = "audio/"
