@@ -35,11 +35,9 @@ public class PlaylistService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
 
-    @Autowired
-    private AmazonS3 amazonS3;
+    private final CloudUploadService uploadService;
 
-    @Value("${aws.s3.bucket_name}")
-    private String s3BucketName;
+
 
     @Value("${aws.s3.size}")
     private Integer sizeLimit;
@@ -71,8 +69,8 @@ public class PlaylistService {
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentLength(file.getSize());
 
-            // Save file in S3
-            amazonS3.putObject(s3BucketName, fileName, file.getInputStream(), metadata);
+            // Save file in cloud
+            String URL = uploadService.uploadFile(fileName, file.getInputStream(), metadata);
 
             // Save file state in playlist
             Optional<Playlist> playlist = playlistRepository.findByEmail(principal.getName());
@@ -87,7 +85,7 @@ public class PlaylistService {
                 }
 
                 userPlaylist.setUpdatedDate(new Date().toString());
-                userPlaylist.getAudios().add(getAudio(file, fileName, audioId));
+                userPlaylist.getAudios().add(getAudio(file, fileName, audioId,URL));
             } else {
                 // Create playlist
                 userPlaylist = new Playlist();
@@ -95,7 +93,7 @@ public class PlaylistService {
                 userPlaylist.setCreatedDate(new Date().toString());
                 userPlaylist.setUpdatedDate(new Date().toString());
 
-                Audio audio = getAudio(file, fileName, audioId);
+                Audio audio = getAudio(file, fileName, audioId,URL);
                 userPlaylist.setAudios(List.of(audio));
             }
 
@@ -109,11 +107,12 @@ public class PlaylistService {
         }
     }
 
-    private Audio getAudio(MultipartFile file, String fileName, String id) {
+    private Audio getAudio(MultipartFile file, String fileName, String id,String URL) {
         Audio audio = new Audio();
         audio.setId(id);
         audio.setName(fileName);
         audio.setSize(file.getSize());
+        audio.setUrl(URL);
         audio.setCreatedDate(new Date().toString());
         audio.setUpdatedDate(new Date().toString());
         return audio;

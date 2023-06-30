@@ -21,6 +21,9 @@ public class Audio {
     @DynamoDBAttribute
     private Long size;
 
+    @DynamoDBAttribute
+    private String url;
+
     @DynamoDBAttribute(attributeName = "created_date")
     private String createdDate;
 

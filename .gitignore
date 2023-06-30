@@ -37,6 +37,5 @@ build/
 
 
 ##properties
-*.yml
-*.properties
 *.mp3
+/src/main/resources/

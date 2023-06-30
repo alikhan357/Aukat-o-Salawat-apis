@@ -16,6 +16,7 @@ public class AudioDTO {
     private String id;
     private String name;
     private Long size;
+    private String url;
     private String createdDate;
     private String updatedDate;
     private Boolean isFav = Boolean.FALSE;

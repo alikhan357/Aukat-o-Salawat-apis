@@ -50,16 +50,17 @@ public class ReminderService {
             Optional<Reminder> reminderDb = repository.findByEmailAndNamaz(principal.getName(), reminder.getNamaz());
 
             if (reminder.getIsEnabled()) {
-                assert reminder.getTime() != null : "Reminder time cannot be empty";
-                assert reminder.getAudioFile() != null : "Please select audio before enabling reminder";
-                assert user.get().getTimeZone() != null : "Please update you location";
+                if (user.get().getTimeZone() == null) throw new Exception("Please update you location");
+                if (reminder.getTime() == null) throw new Exception("Reminder Time cannot be empty");
+                if (reminder.getAudioFile() == null) throw new Exception("Reminder AUDIO cannot be empty");
+                if (reminder.getAudioUrl() == null) throw new Exception("Reminder AUDIO cannot be empty");
             }
 
             Reminder reminderObj = modelMapper.map(reminder, Reminder.class);
 
             reminderObj.setEmail(principal.getName());
             reminderObj.setAdjustedTime(reminderObj.getAdjustedTime() == null ? 0 : reminderObj.getAdjustedTime());
-            reminderObj.setAudioUrl(s3Url + reminder.getAudioFile());
+            reminderObj.setAudioUrl(reminder.getAudioUrl());
             reminderObj.setTimeZone(user.get().getTimeZone());
             reminderObj.setCreatedDate(Helper.getCurrentDateByTimezone(user.get().getTimeZone()));
             reminderObj.setUpdatedDate(reminderObj.getCreatedDate());
