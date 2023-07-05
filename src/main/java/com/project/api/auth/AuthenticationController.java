@@ -3,6 +3,7 @@ package com.project.api.auth;
 import com.project.api.dto.request.AuthenticationRequest;
 import com.project.api.dto.request.RegisterRequest;
 import com.project.api.dto.response.AuthenticationResponse;
+import com.project.api.dto.response.ServiceResponse;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,16 +23,17 @@ public class AuthenticationController {
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationController.class);
 
     @PostMapping("/signup")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request){
-
+    public ResponseEntity<ServiceResponse> register(@RequestBody RegisterRequest request){
         LOGGER.info("SignUp method called. Request {}",request);
-        return ResponseEntity.ok(service.register(request));
+        ServiceResponse response = service.register(request);
+        return ResponseEntity.status(response.getCode()).body(response);
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request){
+    public ResponseEntity<ServiceResponse> authenticate(@RequestBody AuthenticationRequest request){
         LOGGER.info("authenticate method called. Request {}",request);
-        return ResponseEntity.ok(service.authenticate(request));
+        ServiceResponse response = service.authenticate(request);
+        return ResponseEntity.status(response.getCode()).body(response);
 
     }
 }

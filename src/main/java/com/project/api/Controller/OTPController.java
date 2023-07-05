@@ -2,6 +2,7 @@ package com.project.api.Controller;
 
 import com.project.api.dto.request.AlexaCodeRequest;
 import com.project.api.dto.request.OTPGenRequest;
+import com.project.api.dto.request.OTPValidateRequest;
 import com.project.api.dto.request.PasswordRequest;
 import com.project.api.dto.response.ServiceResponse;
 import com.project.api.service.OTPService;
@@ -28,8 +29,10 @@ public class OTPController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NamazController.class);
     @PostMapping("/validate")
-    public ResponseEntity<ServiceResponse> validate(@RequestBody Map<String,String> otp) {
-        return ResponseEntity.ok(new ServiceResponse(HttpStatus.OK.value(),"CODE VALIDATED",null));
+    public ResponseEntity<ServiceResponse> validate(@RequestBody OTPValidateRequest request) {
+        LOGGER.info("validate called {}",request);
+        ServiceResponse response = otpService.validateOTP(request);
+        return ResponseEntity.status(response.getCode()).body(response);
     }
 
     @PostMapping("/generate")
@@ -38,20 +41,5 @@ public class OTPController {
         ServiceResponse response = otpService.generateOTP(request);
         return ResponseEntity.status(response.getCode()).body(response);
     }
-
-    @GetMapping("/alexa/generate")
-    public ResponseEntity<ServiceResponse> generateAlexaCode(Principal principal) {
-        LOGGER.info("generateAlexaCode called by {}",principal.getName());
-        ServiceResponse response = otpService.generateAlexaCode(principal.getName());
-        return ResponseEntity.status(response.getCode()).body(response);
-    }
-
-    @PostMapping("/alexa/validate")
-            public ResponseEntity<ServiceResponse> validateAlexaCode(@RequestBody AlexaCodeRequest request) {
-        LOGGER.info("validateAlexaCode called {}",request);
-        ServiceResponse response = otpService.validateAlexaCode(request);
-        return ResponseEntity.status(response.getCode()).body(response);
-    }
-
 
 }
