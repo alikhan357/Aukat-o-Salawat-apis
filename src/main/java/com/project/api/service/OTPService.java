@@ -26,9 +26,6 @@ public class OTPService {
     @Autowired
     private EmailService emailService;
 
-    @Autowired
-    private UserDeviceRepository userDeviceRepository;
-
     private static final Logger LOGGER = LoggerFactory.getLogger(OTPService.class);
     private static final Map<String, String> otpMap = new HashMap<>();
     private static final Map<String, Date> otpExpiry = new HashMap<>();
